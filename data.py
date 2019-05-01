@@ -1,4 +1,5 @@
 import os
+import re
 MIN_FREQ = 3
 def invert_dict(d):
     res = {}
@@ -50,7 +51,39 @@ def replace_word(word):
         Replaces rare words with categories (numbers, dates, etc...)
     """
     ### YOUR CODE HERE
-    raise NotImplementedError
+    twodigit = re.compile("[0-9][0-9]") # Two-digit number
+    if bool(twodigit.match(word)):
+        return "twoDigitNum"
+    fourdigit = re.compile("[0-9][0-9][0-9][0-9]") # Four-digit number
+    if bool(fourdigit.match(word)):
+        return "fourDigitNum"
+    if bool(re.search('[0-9]', word)) and bool(re.search('[a-zA-Z]', word)): # contains alpha and digit
+        return "containsDigitAndAlpha"
+    digitanddash = re.compile("\d") # contains dash and digit
+    if bool(digitanddash.match(word)) and '-' in word:
+        return "containsDigitAndDash"
+    digitandslash = re.compile("\d") # contains slash and digit
+    if bool(digitandslash.match(word)) and '/' in word:
+        return "containsDigitAndSlash"
+    digitandcomma = re.compile("\d") # contains comma and digit
+    if bool(digitandcomma.match(word)) and ',' in word:
+        return "containsDigitAndComma"
+    digitandperiod = re.compile("\d") # contains period and digit
+    if bool(digitandperiod.match(word)) and '.' in word:
+        return "containsDigitAndPeriod"
+    number = re.compile("^[-+]?[0-9]+$") # number
+    if bool(number.match(word)):
+        return "otherNum"
+    if word.isupper():
+        return "allCaps"
+    capperiod = re.compile("^[A-Z].$")  # cap period
+    if bool(capperiod.match(word)):
+        return "capPeriod"
+    capword = re.compile("^[A-Z][a-z]+$")  # cap word
+    if bool(capword.match(word)):
+        return "initCap"
+    if word.islower():
+        return "lowerCase"
     ### END YOUR CODE
     return "UNK"
 
