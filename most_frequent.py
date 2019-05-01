@@ -1,12 +1,31 @@
 from data import *
 
+def incrementpos(word_to_pos_count, token):
+    if token[1] in word_to_pos_count[token[0]]:
+        word_to_pos_count[token[0]][token[1]] += 1
+    else:
+        word_to_pos_count[token[0]][token[1]] = 1
+
+
 def most_frequent_train(train_data):
     """
     Gets training data that includes tagged sentences.
     Returns a dictionary that maps every word in the training set to its most frequent tag.
     """
     ### YOUR CODE HERE
-    raise NotImplementedError
+    word_to_pos_count = dict()
+    word_to_max_pos = dict()
+    for sent in train_data:
+       for token in sent:
+            if token[0] in word_to_pos_count:
+                incrementpos(word_to_pos_count, token)
+            else:
+                word_to_pos_count[token[0]] = dict()
+                incrementpos(word_to_pos_count, token)
+    for word in word_to_pos_count:
+        pos_max = max(word_to_pos_count[word])
+        word_to_max_pos[word] = pos_max
+    return word_to_max_pos
     ### END YOUR CODE
 
 def most_frequent_eval(test_set, pred_tags):
