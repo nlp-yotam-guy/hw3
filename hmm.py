@@ -9,6 +9,29 @@ def add_to_dict(key,dict):
         dict[key] = 1
         return 1
 
+def Calculate_q_ML(word1,word2,word3,lambda1,lambda2,trigram_counts,bigram_counts,unigram_counts,train_token_count):
+    # Calculate q_ML of the trigram
+    if (word1, word2, word3) in trigram_counts:
+        q_tri = float(trigram_counts[(word1, word2, word3)]) / bigram_counts[
+        (word1, word2)]
+    else:
+        q_tri = 0
+    # Calculate q_ML of the bigram
+    if (word2, word3) in bigram_counts:
+        q_bi = float(bigram_counts[(word2, word3)]) / unigram_counts[word2]
+    else:
+        q_bi = 0
+    # Calculate q_ML of the unigram
+
+    if word3 in unigram_counts:
+        q_uni = float(unigram_counts[word3]) / train_token_count
+    else:
+        q_uni = 0
+
+    # Calculate  the linear interpolation
+    q = (lambda1 * q_tri + lambda2 * q_bi + float((1.0 - lambda1 - lambda2)) * q_uni)
+    return q
+
 def hmm_train(sents):
     """
         sents: list of tagged sentences
@@ -27,14 +50,16 @@ def hmm_train(sents):
             add_to_dict((sentence[j][0], sentence[j][1]), e_word_tag_counts)
             add_to_dict(sentence[j][1], e_tag_counts)
             total_tokens += 1
-        add_to_dict((sentence[0][1], sentence[1][1]), q_bi_counts)
+        if len(sentence) > 1:
+            add_to_dict((sentence[0][1], sentence[1][1]), q_bi_counts)
+            add_to_dict((sentence[1][1]), q_uni_counts)
+            add_to_dict((sentence[1][0], sentence[1][1]), e_word_tag_counts)
+            add_to_dict(sentence[1][1], e_tag_counts)
+            total_tokens += 1
         add_to_dict((sentence[0][1]), q_uni_counts)
-        add_to_dict((sentence[1][1]), q_uni_counts)
         add_to_dict((sentence[0][0], sentence[0][1]), e_word_tag_counts)
-        add_to_dict((sentence[1][0], sentence[1][1]), e_word_tag_counts)
         add_to_dict(sentence[0][1], e_tag_counts)
-        add_to_dict(sentence[1][1], e_tag_counts)
-        total_tokens += 2
+        total_tokens += 1
     ### END YOUR CODE
     return total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,e_tag_counts
 
@@ -45,7 +70,7 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     """
     predicted_tags = [""] * (len(sent))
     ### YOUR CODE HERE
-    raise NotImplementedError
+    Calculate_q_ML()
     ### END YOUR CODE
     return predicted_tags
 
