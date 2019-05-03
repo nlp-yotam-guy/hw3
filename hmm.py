@@ -63,6 +63,13 @@ def hmm_train(sents):
     ### END YOUR CODE
     return total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,e_tag_counts
 
+def get_all_tags(e_word_tag_counts, word):
+    s = {}
+    for key in e_word_tag_counts:
+        if key[0] == word:
+            s.add(key[1])
+    return s
+
 def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,e_tag_counts, lambda1, lambda2):
     """
         Receives: a sentence to tag and the parameters learned by hmm
@@ -70,7 +77,34 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     """
     predicted_tags = [""] * (len(sent))
     ### YOUR CODE HERE
-    Calculate_q_ML()
+    pi = dict()
+    bp = dict()
+    S = dict()
+    n = len(sent)
+
+    #Initialization to S
+    S[-2] = {'*'}
+    S[-1] = {'*'}
+    for k in range(n):
+        S[k] = get_all_tags(e_word_tag_counts, sent[k])
+
+    #base case
+    pi[(0, '*', '*')] = 1
+
+    for k in range(n):
+        for u in S[k-1]:
+            for v in S[k]:
+                prob_max = 0
+                bp_max = ''
+                for w in S[k-2]:
+                    prob = pi[(k-1,w,u)] * Calculate_q_ML(w,u,v,lambda1,lambda2,q_tri_counts,q_bi_counts,q_uni_counts,total_tokens)
+                    if prob > prob_max:
+                        prob_max = prob
+                        bp_max = w
+
+                pi[(k,u,v)] = prob_max
+                bp[(k - 1, w, u)] = bp_max
+
     ### END YOUR CODE
     return predicted_tags
 
