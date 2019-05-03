@@ -86,9 +86,10 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     #Initialization to S
     S[-2] = {'*'}
     S[-1] = {'*'}
-    for k in range(n):
+    for k in range(n-1):
         #S[k] = get_all_tags(e_word_tag_counts, sent[k])
         S[k] = e_tag_counts.keys()
+    S[n-1] = {'STOP'}
     #base case
     pi[(-1, '*', '*')] = 1.0
 
