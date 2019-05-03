@@ -72,9 +72,22 @@ def get_all_tags(e_word_tag_counts, word):
     return s
 
 def prune(tags,word):
-    if word.endswith('ing') or word.endswith('ed'):
-        verbs = {'VBG','VBD','VBN','VBP','VBZ','VB'}
-        return verbs.intersection(tags)
+    if word.endswith('ing'):
+        verbs = {'VBG', 'VBP'}
+        verbs_tags = verbs.intersection(tags)
+        if len(verbs_tags) == 0:
+            return tags
+        else:
+            return verbs_tags
+
+    if word.endswith('ed'):
+        verbs = {'VBD'}
+        verbs_tags = verbs.intersection(tags)
+        if len(verbs_tags) == 0:
+            return tags
+        else:
+            return verbs_tags
+
     else:
         return tags
 
@@ -87,7 +100,6 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     predicted_tags = [""] * (len(sent))
     ### YOUR CODE HERE
     sent.append(('STOP', 'STOP'))
-    verbs = {'VBG', 'VBD', 'VBN', 'VBP', 'VBZ', 'VB'}
     pi = dict()
     bp = dict()
     S = dict()
@@ -97,10 +109,7 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     S[-1] = {'*'}
     for k in range(n-1):
         S[k] = get_all_tags(e_word_tag_counts, sent[k])
-        if sent[k][0].endswith('ing') or sent[k][0].endswith('ed'):
-            for tag in S[k].copy():
-                if tag not in verbs:
-                    S[k].remove(tag)
+        #S[k] = prune(S[k],sent[k][0])
         #S[k] = e_tag_counts.keys()
     S[n-1] = {'STOP'}
     #base case
