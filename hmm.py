@@ -43,6 +43,7 @@ def hmm_train(sents):
     q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,e_tag_counts = {}, {}, {}, {}, {}
     ### YOUR CODE HERE
     for sentence in sents:
+        sentence.append(('STOP', 'STOP'))
         for j in range(2, len(sentence)):
             add_to_dict((sentence[j - 2][1], sentence[j - 1][1], sentence[j][1]), q_tri_counts)
             add_to_dict((sentence[j - 1][1], sentence[j][1]), q_bi_counts)
@@ -77,11 +78,11 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     """
     predicted_tags = [""] * (len(sent))
     ### YOUR CODE HERE
+    sent.append(('STOP', 'STOP'))
     pi = dict()
     bp = dict()
     S = dict()
     n = len(sent)
-
     #Initialization to S
     S[-2] = {'*'}
     S[-1] = {'*'}
@@ -101,10 +102,23 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
                     if prob > prob_max:
                         prob_max = prob
                         bp_max = w
-
                 pi[(k,u,v)] = prob_max
                 bp[(k - 1, w, u)] = bp_max
+    prob_max = 0
+    u_max = ''
+    v_max = ''
+    for u in S[n - 2]:
+        for v in S[n-1]:
+            prob = pi[(n-1,u,v)*Calculate_q_ML(u,v,'STOP',lambda1,lambda2,q_tri_counts,q_bi_counts,q_uni_counts,total_tokens)]
+            if prob > prob_max:
+                prob_max = prob
+                u_max = u
+                v_max = v
+    predicted_tags.append(v_max)
+    predicted_tags.append(u_max)
 
+    for k in range(n-4,-1,-1):
+        predicted_tags.append(bp[(k+2,predicted_tags[k+1],predicted_tags[k+2])])
     ### END YOUR CODE
     return predicted_tags
 
