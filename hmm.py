@@ -71,6 +71,14 @@ def get_all_tags(e_word_tag_counts, word):
             s.add(key[1])
     return s
 
+def prune(tags,word):
+    if word.endswith('ing') or word.endswith('ed'):
+        verbs = {'VBG','VBD','VBN','VBP','VBZ','VB'}
+        return verbs.intersection(tags)
+    else:
+        return tags
+
+
 def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,e_tag_counts, lambda1, lambda2):
     """
         Receives: a sentence to tag and the parameters learned by hmm
@@ -79,6 +87,7 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     predicted_tags = [""] * (len(sent))
     ### YOUR CODE HERE
     sent.append(('STOP', 'STOP'))
+    verbs = {'VBG', 'VBD', 'VBN', 'VBP', 'VBZ', 'VB'}
     pi = dict()
     bp = dict()
     S = dict()
@@ -87,8 +96,12 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     S[-2] = {'*'}
     S[-1] = {'*'}
     for k in range(n-1):
-        #S[k] = get_all_tags(e_word_tag_counts, sent[k])
-        S[k] = e_tag_counts.keys()
+        S[k] = get_all_tags(e_word_tag_counts, sent[k])
+        if sent[k][0].endswith('ing') or sent[k][0].endswith('ed'):
+            for tag in S[k].copy():
+                if tag not in verbs:
+                    S[k].remove(tag)
+        #S[k] = e_tag_counts.keys()
     S[n-1] = {'STOP'}
     #base case
     pi[(-1, '*', '*')] = 1.0
@@ -102,8 +115,12 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
                     if (k-1,w,u) not in pi:
                         prob = 0
                     else:
+                        if (sent[k][0], v) not in e_word_tag_counts:
+                            e=0
+                        else:
+                            e = float(e_word_tag_counts[(sent[k][0], v)])/e_tag_counts[(sent[k][1])]
                         q = Calculate_q_ML(w,u,v,lambda1,lambda2,q_tri_counts,q_bi_counts,q_uni_counts,total_tokens)
-                        prob = pi[(k-1,w,u)] * q
+                        prob = pi[(k-1,w,u)] * q *e
                     if prob > prob_max:
                         prob_max = prob
                         bp_max = w
@@ -149,7 +166,7 @@ def hmm_eval(test_data, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e
             if sentence[i][1] != tags_from_viterbi[i]:
                 errors+=1
             counter+=1
-    acc_viterbi = 1 - errors/counter
+    acc_viterbi = 1 - float(errors)/counter
     ### END YOUR CODE
 
     return acc_viterbi
