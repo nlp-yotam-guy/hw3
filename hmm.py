@@ -108,7 +108,7 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
                         prob_max = prob
                         bp_max = w
                 pi[(k,u,v)] = prob_max
-                bp[(k - 1, w, u)] = bp_max
+                bp[(k, u, v)] = bp_max
     prob_max = 0
     u_max = ''
     v_max = ''
