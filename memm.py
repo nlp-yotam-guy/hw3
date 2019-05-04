@@ -26,7 +26,25 @@ def extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_t
     features = {}
     features['word'] = curr_word
     ### YOUR CODE HERE
-    raise NotImplementedError
+    features['prev_word'] = prev_word
+    features['prev_prev_word'] = prevprev_word
+    features['prev_label'] = prev_tag
+    features['prev_prev_label'] = prevprev_tag
+    features['next_word'] = next_word
+    for i in xrange(1, min(5, len(curr_word))):
+        features['prefix' + str(i)] = curr_word[:i]
+    for i in xrange(1, min(5, len(curr_word))):
+        features['suffix' + str(i)] = curr_word[-i:]
+    if any(x.isdigit() for x in curr_word):
+        features['has_number'] = 1
+    features['is_lower'] = curr_word.islower()
+    features['is_upper'] = curr_word.isupper()
+    features['length'] = len(curr_word)
+    if '-' in curr_word:
+        features['contains_hyphen'] = 1
+    features['prev_prev_tag'] = str(prev_tag) + '^' + str(prevprev_tag)
+    features['prev_word_tag'] = str(prev_word) + '^' + str(prev_tag)
+    features['prev_prev_word_tag'] = str(prevprev_word) + '^' + str(prevprev_tag)
     ### END YOUR CODE
     return features
 
