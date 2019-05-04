@@ -26,7 +26,17 @@ def extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_t
     features = {}
     features['word'] = curr_word
     ### YOUR CODE HERE
-    raise NotImplementedError
+    features['prev_word'] = prev_word
+    features['prev_prev_word'] = prevprev_word
+    features['prev_label'] = prev_tag
+    features['prev_prev_label'] = prevprev_tag
+    features['next_word'] = next_word
+    features['has_number'] = bool(re.search('[0-9]', curr_word))
+    features['is_lower'] = curr_word.islower()
+    features['is_upper'] = curr_word.isupper()
+    features['length'] = len(curr_word)
+    features['prev_word_tag'] = (prev_word, prev_tag)
+    features['prev_prev_word_tag'] = (prevprev_tag, prevprev_tag)
     ### END YOUR CODE
     return features
 
