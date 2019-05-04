@@ -147,6 +147,7 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
         Returns: predicted tags for the sentence
     """
     predicted_tags = [""] * (len(sent))
+    import random
     ### YOUR CODE HERE
     sent.append(('STOP', 'STOP'))
     pi = dict()
@@ -171,7 +172,8 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
                 S[k] = set(e_word_tag_counts[sent[k][0]])
             else:
                 S[k] = set(e_tag_counts)
-                S[k] = prune(S[k],sent[k][0])
+                # S[k] = prune(S[k],sent[k][0])
+                # S[k] = S[k].union({'NN','NNS','.'})
         end_max_prob=0
         for u in S[k-1]:
             for v in S[k]:
@@ -216,6 +218,7 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     predicted_tags[n-3] = ym
 
     for k in range(n-4,-1,-1):
+        # predicted_tags[k] = bp[(k + 2, predicted_tags[k + 1], predicted_tags[k + 2])]
         if (k+2,predicted_tags[k+1],predicted_tags[k+2]) in bp:
             predicted_tags[k] = bp[(k+2,predicted_tags[k+1],predicted_tags[k+2])]
         else:
