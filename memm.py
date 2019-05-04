@@ -40,8 +40,11 @@ def extract_features_base(curr_word, next_word, prev_word, prevprev_word, prev_t
     features['is_lower'] = curr_word.islower()
     features['is_upper'] = curr_word.isupper()
     features['length'] = len(curr_word)
-    #features['prev_word_tag'] = (prev_word, prev_tag)
-    #features['prev_prev_word_tag'] = (prevprev_tag, prevprev_tag)
+    if '-' in curr_word:
+        features['contains_hyphen'] = 1
+    features['prev_prev_tag'] = str(prev_tag) + '^' + str(prevprev_tag)
+    features['prev_word_tag'] = str(prev_word) + '^' + str(prev_tag)
+    features['prev_prev_word_tag'] = str(prevprev_word) + '^' + str(prevprev_tag)
     ### END YOUR CODE
     return features
 
