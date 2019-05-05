@@ -23,7 +23,8 @@ def most_frequent_train(train_data):
                 word_to_pos_count[token[0]] = dict()
                 incrementpos(word_to_pos_count, token)
     for word in word_to_pos_count:
-        pos_max = max(word_to_pos_count[word])
+        #pos_max = max(word_to_pos_count[word])
+        pos_max= max(word_to_pos_count[word], key=word_to_pos_count[word].get)
         word_to_max_pos[word] = pos_max
     return word_to_max_pos
     ### END YOUR CODE
@@ -39,6 +40,8 @@ def most_frequent_eval(test_set, pred_tags):
     for test_sent in test_set:
         for token in test_sent:
             if pred_tags[token[0]] != token[1]:
+                print "token 0 " + token[0], "token 1 " + token[1]
+                print pred_tags[token[0]], token[1]
                 errors +=1
             tokens +=1
     return 1 - float(errors)/tokens
