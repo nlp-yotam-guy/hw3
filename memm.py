@@ -89,6 +89,9 @@ def memm_greedy(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments):
     predicted_tags = [""] * (len(sent))
     ### YOUR CODE HERE
 
+    #for j in range(len(sent)):
+    #    prob = logreg.predict_proba(vec)
+
     ### END YOUR CODE
     return predicted_tags
 
