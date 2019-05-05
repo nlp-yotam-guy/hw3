@@ -54,7 +54,7 @@ def replace_word(word):
     twodigit = re.compile("[0-9][0-9]") # Two-digit number
     if bool(twodigit.match(word)):
         return "twoDigitNum"
-    fourdigit = re.compile("[0-9][0-9][0-9][0-9]") # Four-digit number
+    fourdigit = re.compile("[0-9],?[0-9][0-9][0-9]") # Four-digit number
     if bool(fourdigit.match(word)):
         return "fourDigitNum"
     if bool(re.search('[0-9]', word)) and bool(re.search('[a-zA-Z]', word)): # contains alpha and digit
@@ -71,9 +71,6 @@ def replace_word(word):
     digitandperiod = re.compile("\d") # contains period and digit
     if bool(digitandperiod.match(word)) and '.' in word:
         return "containsDigitAndPeriod"
-    number = re.compile("^[-+]?[0-9]+$") # number
-    if bool(number.match(word)):
-        return "otherNum"
     if word.isupper():
         return "allCaps"
     capperiod = re.compile("^[A-Z].$")  # cap period
@@ -84,6 +81,14 @@ def replace_word(word):
         return "initCap"
     if word.islower():
         return "lowerCase"
+    if (x.isdigit() or x == ',' for x in word): #number
+        return "number"
+    company1 = re.compile("^[A-Z]+[a-z]+-[A-Z]+[a-z]+$")  # company word
+    company2 = re.compile("([A-Z].[A-Z])+")
+    if bool(company1.match(word)) or bool(company2.match(word)):
+        return "company"
+    if word.endswith('ly'):
+        return "adverb"
     ### END YOUR CODE
     return "UNK"
 
