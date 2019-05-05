@@ -87,8 +87,18 @@ def replace_word(word):
     company2 = re.compile("([A-Z].[A-Z])+")
     if bool(company1.match(word)) or bool(company2.match(word)):
         return "company"
-    if word.endswith('ly'):
+    if word.endswith('ly'): # adverb
         return "adverb"
+    person = re.compile("^[A-Z][a-z]+ [A-Z][a-z]+$")  # person
+    if bool(person.match(word)):
+        return "person"
+    if word.endswith('ish'):  # adjective
+        return "adjective"
+    if word.endswith('ing'):  # verb
+        return "verb"
+    
+
+
     ### END YOUR CODE
     return "UNK"
 
