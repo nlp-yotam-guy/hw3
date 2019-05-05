@@ -96,9 +96,6 @@ def replace_word(word):
         return "adjective"
     if word.endswith('ing'):  # verb
         return "verb"
-    
-
-
     ### END YOUR CODE
     return "UNK"
 
