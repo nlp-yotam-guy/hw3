@@ -40,8 +40,6 @@ def most_frequent_eval(test_set, pred_tags):
     for test_sent in test_set:
         for token in test_sent:
             if pred_tags[token[0]] != token[1]:
-                print "token 0 " + token[0], "token 1 " + token[1]
-                print pred_tags[token[0]], token[1]
                 errors +=1
             tokens +=1
     return 1 - float(errors)/tokens
