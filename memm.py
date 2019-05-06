@@ -89,11 +89,14 @@ def memm_greedy(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments):
     predicted_tags = [""] * (len(sent))
 
     ### YOUR CODE HERE
-    words = np.array([word[0] for word in sent])
-    for i in range(len(words)):
+    for i in range(len(sent)):
+        # get features dictionary of word i'th in sentence
         features = extract_features(sent,i)
+        # vectorize dictionary to use in the model
         v = vectorize_features(vec,features)
+        # predict tag index (returns numpy array of length 1)
         pred = logreg.predict(v)
+        # turn index to tag using the dictionary
         predicted_tags[i] = index_to_tag_dict[pred[0]]
 
     ### END YOUR CODE
@@ -106,25 +109,29 @@ def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments)
     """
     predicted_tags = [""] * (len(sent))
     ### YOUR CODE HERE
+    # init dictionaries for memoization
     pi = dict()
     bp = dict()
     S = dict()
     n = len(sent)
     S[-1] = {'*'}
     S[-2] = {'*'}
+    # base case
     pi[(0,'*','*')] = 1
     end_max_prob = 0
     for k in range(n):
         features = extract_features(sent,k)
         v = vectorize_features(vec,features)
+        # use predict_proba to get the probabilities of all possible tags (returns numpy array of indices)
         tags_idx = logreg.predict_proba(v)
+        # convert all indices to tags
         S[k] = set([index_to_tag_dict[i] for i in tags_idx])
-
+        # rest of viterbi algorithm
         for u in S[k-1]:
             for v in S[k]:
                 max_prob = 0
                 for t in S[k-2]:
-                    # ***** calculate q somehow *******
+                    # ***** calculate q somehow ******* (maybe use 'predict_proba' in some way)
                     prob = pi[(k-1,t,u)] * q
                     # tag = argmax(probabilities)
                     if prob > max_prob:
@@ -166,8 +173,10 @@ def memm_eval(test_data, logreg, vec, index_to_tag_dict, extra_decoding_argument
 
     for i, sen in enumerate(test_data):
         ### YOUR CODE HERE
+        # get predictions
         greedy_preds = memm_greedy(sen,logreg,vec,index_to_tag_dict,extra_decoding_arguments)
         viterbi_preds = memm_viterbi(sen,logreg,vec,index_to_tag_dict,extra_decoding_arguments)
+        # calculate sentence accuracy
         for j in range(len(sen)):
             total_words_count+=1
             if sen[j][1] == greedy_preds[j]:
@@ -203,7 +212,7 @@ def build_tag_to_idx_dict(train_sentences):
     tag_to_idx_dict['*'] = curr_tag_index
     return tag_to_idx_dict
 
-
+# ****** remember to remove data slicing *********
 if __name__ == "__main__":
     full_flow_start = time.time()
     train_sents = read_conll_pos_file("Penn_Treebank/train.gold.conll")
