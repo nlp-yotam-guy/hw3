@@ -87,10 +87,14 @@ def memm_greedy(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments):
         Returns: predicted tags for the sentence
     """
     predicted_tags = [""] * (len(sent))
-    ### YOUR CODE HERE
 
-    #for j in range(len(sent)):
-    #    prob = logreg.predict_proba(vec)
+    ### YOUR CODE HERE
+    words = np.array([word[0] for word in sent])
+    for i in range(len(words)):
+        features = extract_features(sent,i)
+        v = vectorize_features(vec,features)
+        pred = logreg.predict(v)
+        predicted_tags[i] = index_to_tag_dict[pred[0]]
 
     ### END YOUR CODE
     return predicted_tags
@@ -102,7 +106,41 @@ def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments)
     """
     predicted_tags = [""] * (len(sent))
     ### YOUR CODE HERE
-    raise NotImplementedError
+    pi = dict()
+    bp = dict()
+    S = dict()
+    n = len(sent)
+    S[-1] = {'*'}
+    S[-2] = {'*'}
+    pi[(0,'*','*')] = 1
+    end_max_prob = 0
+    for k in range(n):
+        features = extract_features(sent,k)
+        v = vectorize_features(vec,features)
+        tags_idx = logreg.predict_proba(v)
+        S[k] = set([index_to_tag_dict[i] for i in tags_idx])
+
+        for u in S[k-1]:
+            for v in S[k]:
+                max_prob = 0
+                for t in S[k-2]:
+                    # ***** calculate q somehow *******
+                    prob = pi[(k-1,t,u)] * q
+                    # tag = argmax(probabilities)
+                    if prob > max_prob:
+                        max_prob = prob
+                        pi[(k,u,v)] = prob
+                        bp[(k,u,v)] = tag
+
+            if k == n-1 and pi[(k,u,v)] > end_max_prob:
+                end_max_prob = pi[(k,u,v)]
+                yn = v
+                ym = u
+    predicted_tags[n-1] = yn
+    predicted_tags[n-2] = ym
+    for j in range(n-3,-1,-1):
+        predicted_tags[j] = bp[(j+2,predicted_tags[j+1],predicted_tags[k+2])]
+
     ### END YOUR CODE
     return predicted_tags
 
@@ -128,7 +166,16 @@ def memm_eval(test_data, logreg, vec, index_to_tag_dict, extra_decoding_argument
 
     for i, sen in enumerate(test_data):
         ### YOUR CODE HERE
-        ### Make sure to update Viterbi and greedy accuracy
+        greedy_preds = memm_greedy(sen,logreg,vec,index_to_tag_dict,extra_decoding_arguments)
+        viterbi_preds = memm_viterbi(sen,logreg,vec,index_to_tag_dict,extra_decoding_arguments)
+        for j in range(len(sen)):
+            total_words_count+=1
+            if sen[j][1] == greedy_preds[j]:
+                correct_greedy_preds += 1
+            if sen[j][1] == viterbi_preds[j]:
+                correct_viterbi_preds += 1
+            acc_greedy = float(correct_greedy_preds) / float(total_words_count)
+            acc_viterbi = float(correct_viterbi_preds) / float(total_words_count)
         ### END YOUR CODE
 
         if should_log(i):
@@ -188,7 +235,7 @@ if __name__ == "__main__":
     all_examples.extend(dev_examples)
 
     print "Vectorize examples"
-    all_examples_vectorized = vec.fit_transform(all_examples)
+    all_examples_vectorized = vec.fit_transform(all_examples[:10])
     train_examples_vectorized = all_examples_vectorized[:num_train_examples]
     dev_examples_vectorized = all_examples_vectorized[num_train_examples:]
     print "Done"
@@ -197,7 +244,7 @@ if __name__ == "__main__":
         multi_class='multinomial', max_iter=128, solver='lbfgs', C=100000, verbose=1)
     print "Fitting..."
     start = time.time()
-    logreg.fit(train_examples_vectorized, train_labels)
+    logreg.fit(train_examples_vectorized, train_labels[:10])
     end = time.time()
     print "End training, elapsed " + str(end - start) + " seconds"
     # End of log linear model training
