@@ -117,7 +117,7 @@ def prune(word, tags):
         return set(['IN', 'RB'])
     if word in {'what', 'how', 'when', 'who', 'whom', 'where', 'which', 'whose', 'why'} or word == 'w_h':
         return set(['WDT', 'WP', 'WP$', 'WRB'])
-    if word == 'but' or word == 'Coordinating_Conjunction':
+    if word == 'but' or word == 'coordinating_conjunction':
         return set(['CC'])
     if word == 'that':
         return set(['CC', 'IN', 'DT', 'WDT'])
@@ -139,9 +139,9 @@ def prune(word, tags):
         return set(['NNS','JJ','VBZ','VB','VBD','VBN'])
     if word == 'ing':
         return set(['VBP','VBG','NNS','JJ'])
-    if word == 'superlative':
+    if word == 'superlative_like':
         return set(['JJS'])
-    if word == 'comparative' or word.endswith('ier'):
+    if word == 'comparative_like' or word.endswith('ier'):
         return set(['JJR','NNP','NN','JJ','RBR'])
     if word == 'determines':
         return set(['DT'])
@@ -150,13 +150,15 @@ def prune(word, tags):
     if word == 'day':
         return set(['NN','RB'])
     if word == '_adjlike_':
-        return set(['JJ'])
+        return set(['JJ','NNS','NNP','VBN','VBD','VB','VBZ'])
     if word == 'as':
         return set(['RB', 'IN','CC'])
     if word == '_verblike_':
-        return set(['VB'])
+        return set(['VB','VBN'])
     if word == 'company':
         return set(['JJ','NN','NNP','NNS','VBG'])
+    if word =='person':
+        return set(['NN'])
     return tags
 
 def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,e_tag_counts, lambda1, lambda2):

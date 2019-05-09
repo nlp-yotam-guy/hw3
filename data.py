@@ -71,29 +71,24 @@ def replace_word(word):
     digitandperiod = re.compile("\d") # contains period and digit
     if bool(digitandperiod.match(word)) and '.' in word:
         return "containsDigitAndPeriod"
-    company1 = re.compile("^[A-Z]+[a-z]+-[A-Z]+[a-z]+$")  # company word
-    company2 = re.compile("([A-Z].[A-Z])+")
-    if bool(company1.match(word)) or bool(company2.match(word)):
-        return "company"
+
     if word.endswith('ly'): # adverb
         return "adverb"
-    person = re.compile("^[A-Z][a-z]+ [A-Z][a-z]+$")  # person
-    if bool(person.match(word)):
-        return "person"
     if word.endswith('ing'):  # ing
         return "ing"
-    if re.search(r'(fy)',word):
+    if re.search(r'(fy|ate|ize|ating|izes|fying|ates|ated)',word) or word.startswith('dis') or word.startswith('mis') or word.startswith('op') or word.startswith('ob'):
         return '_verblike_'
     if word in {'what', 'how', 'when', 'who', 'whom', 'where', 'which', 'whose', 'why'}:
         return "w_h"
-    if re.search(r'(ion|ty|ics|ment|ence|ance|ness|ist|ism|acy|ice|sion|tion|ency|esis|osis|cian|hood|logy|dom|age)', word):
+    if re.search(r'(ity|ship|ion|ty|ics|ment|ence|ance|ness|ist|ism|acy|ice|sion|tion|ency|esis|osis|cian|hood|logy|dom|age)', word):
         return '_NOUNLIKE_'
-    if re.search(r'(ish|able|ables|ful|less)', word):
+    if re.search(r'(ish|able|ables|ful|less|ive|al|ic)', word) or word.startswith('anti') or word.startswith('im')\
+            or word.startswith('ir') or word.startswith('in') or word.startswith('il') or word.startswith('en'):
         return '_ADJLIKE_'
     if word.endswith('est'):
-        return 'superlative'
+        return 'superlative_like'
     if word.endswith('er') or word == 'less' or word == 'more' or word == 'worse':
-        return 'comparative'
+        return 'comparative_like'
     if word in {'this', 'that', 'these', 'those','such', 'rather', 'quite'}:
         return "determines"
     if word.lower() in {'sunday','monday','tuesday','wednesday','thursday','friday','saturday','yesterday'}:
@@ -105,13 +100,19 @@ def replace_word(word):
     capperiod = re.compile("^[A-Z].$")  # cap period
     if bool(capperiod.match(word)):
         return "capPeriod"
+    person = re.compile("^[A-Z][a-z]+ [A-Z][a-z]+$")  # person
+    if bool(person.match(word)):
+        return "person"
+    company1 = re.compile("^[A-Z]+[a-z]+-[A-Z]+[a-z]+$")  # company word
+    company2 = re.compile("([A-Z].[A-Z])+")
+    if bool(company1.match(word)) or bool(company2.match(word)):
+        return "company"
     if word.isupper():
         return "allCaps"
     capword = re.compile("^[A-Z][a-z]+$")  # cap word
     if bool(capword.match(word)):
         return "initCap"
     if word.islower():
-        print word
         return "lowerCase"
     ### END YOUR CODE
     return "UNK"
