@@ -92,10 +92,15 @@ def replace_word(word):
     person = re.compile("^[A-Z][a-z]+ [A-Z][a-z]+$")  # person
     if bool(person.match(word)):
         return "person"
-    if word.endswith('ish'):  # adjective
-        return "adjective"
     if word.endswith('ing'):  # verb
         return "verb"
+    if re.search(r'(ion|ty|ics|ment|ence|ance|ness|ist|ism)', word):
+        return '_NOUNLIKE_'
+    if re.search(r'(ate|fy|ize|en|em)', word):
+        return '_VERBLIKE_'
+    if re.search(r'(un|in|ble|ry|ish|ious|ical|non)', word):
+        return '_ADJLIKE_'
+
     ### END YOUR CODE
     return "UNK"
 

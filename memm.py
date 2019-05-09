@@ -119,20 +119,24 @@ def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments)
     # base case
     pi[(0,'*','*')] = 1
     end_max_prob = 0
+    teta = logreg.get_params
     for k in range(n):
-        features = extract_features(sent,k)
-        v = vectorize_features(vec,features)
-        # use predict_proba to get the probabilities of all possible tags (returns numpy array of indices)
-        tags_idx = logreg.predict_proba(v)
+        features = extract_features(sent, k)
+        vectorized = vectorize_features(vec, features)
+        # use predict to get the indices of all possible tags
+        tags_idx = logreg.predict(vectorized)
         # convert all indices to tags
         S[k] = set([index_to_tag_dict[i] for i in tags_idx])
         # rest of viterbi algorithm
         for u in S[k-1]:
             for v in S[k]:
                 max_prob = 0
-                for t in S[k-2]:
-                    # ***** calculate q somehow ******* (maybe use 'predict_proba' in some way)
-                    prob = pi[(k-1,t,u)] * q
+                for w in S[k-2]:
+                    # ***** calculate p somehow ******* (maybe use 'predict_proba' in some way)
+                    features = extract_features(v, k)
+                    vectorized = vectorize_features(vec, features)
+                    p = logreg.predict_proba(vectorized)
+                    prob = pi[(k-1, w, u)] * p
                     # tag = argmax(probabilities)
                     if prob > max_prob:
                         max_prob = prob
@@ -244,6 +248,7 @@ if __name__ == "__main__":
     all_examples.extend(dev_examples)
 
     print "Vectorize examples"
+    #sliced here
     all_examples_vectorized = vec.fit_transform(all_examples[:10])
     train_examples_vectorized = all_examples_vectorized[:num_train_examples]
     dev_examples_vectorized = all_examples_vectorized[num_train_examples:]
@@ -253,6 +258,7 @@ if __name__ == "__main__":
         multi_class='multinomial', max_iter=128, solver='lbfgs', C=100000, verbose=1)
     print "Fitting..."
     start = time.time()
+    #sliced here
     logreg.fit(train_examples_vectorized, train_labels[:10])
     end = time.time()
     print "End training, elapsed " + str(end - start) + " seconds"
