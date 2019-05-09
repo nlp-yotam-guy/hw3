@@ -95,6 +95,8 @@ def prune(word, tags):
         return set(['$', 'NN'])
     if word.endswith('tion'):
         return set(['NN', 'NNP'])
+    if word == '_nounlike_':
+        return set(['NNP', 'NNS','JJ','NN'])
     if word == 'to':
         return set(['TO', 'NN'])
     if word == 'from':
@@ -113,9 +115,9 @@ def prune(word, tags):
         return set(['IN'])
     if word == 'about':
         return set(['IN', 'RB'])
-    if word in {'what', 'how', 'when', 'who', 'whom', 'where', 'which', 'whose'}:
-        return set(['WDT', 'WP', 'WP$', 'WRB', 'NN'])
-    if word == 'but':
+    if word in {'what', 'how', 'when', 'who', 'whom', 'where', 'which', 'whose', 'why'} or word == 'w_h':
+        return set(['WDT', 'WP', 'WP$', 'WRB'])
+    if word == 'but' or word == 'Coordinating_Conjunction':
         return set(['CC'])
     if word == 'that':
         return set(['CC', 'IN', 'DT', 'WDT'])
@@ -125,11 +127,36 @@ def prune(word, tags):
         return set(['IN', 'RB', 'RP'])
     if word == 'over':
         return set(['IN', 'RB', 'JJ'])
-    if word == '-LRB-':
-        return set(['-LRB-', 'NN'])
+    if word == '-lrb-':
+        return set(['-LRB-'])
     if word == 'under':
         return set(['IN', 'RB', 'JJ'])
-
+    if word in {'i', 'he', 'she', 'you', 'it'} or word == 'personal_pronoun':
+        return set(['PRP'])
+    if word == 'allcaps':
+        return set(['NN', 'JJ', 'NNS', 'NNP', 'VBD', 'RB'])
+    if word == '_verblike_':
+        return set(['NNS','JJ','VBZ','VB','VBD','VBN'])
+    if word == 'ing':
+        return set(['VBP','VBG','NNS','JJ'])
+    if word == 'superlative':
+        return set(['JJS'])
+    if word == 'comparative' or word.endswith('ier'):
+        return set(['JJR','NNP','NN','JJ','RBR'])
+    if word == 'determines':
+        return set(['DT'])
+    if word == 'adverb':
+        return set(['RB'])
+    if word == 'day':
+        return set(['NN','RB'])
+    if word == '_adjlike_':
+        return set(['JJ'])
+    if word == 'as':
+        return set(['RB', 'IN','CC'])
+    if word == '_verblike_':
+        return set(['VB'])
+    if word == 'company':
+        return set(['JJ','NN','NNP','NNS','VBG'])
     return tags
 
 def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,e_tag_counts, lambda1, lambda2):

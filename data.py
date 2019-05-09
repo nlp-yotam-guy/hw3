@@ -71,18 +71,6 @@ def replace_word(word):
     digitandperiod = re.compile("\d") # contains period and digit
     if bool(digitandperiod.match(word)) and '.' in word:
         return "containsDigitAndPeriod"
-    if word.isupper():
-        return "allCaps"
-    capperiod = re.compile("^[A-Z].$")  # cap period
-    if bool(capperiod.match(word)):
-        return "capPeriod"
-    capword = re.compile("^[A-Z][a-z]+$")  # cap word
-    if bool(capword.match(word)):
-        return "initCap"
-    if word.islower():
-        return "lowerCase"
-    if (x.isdigit() or x == ',' for x in word): #number
-        return "number"
     company1 = re.compile("^[A-Z]+[a-z]+-[A-Z]+[a-z]+$")  # company word
     company2 = re.compile("([A-Z].[A-Z])+")
     if bool(company1.match(word)) or bool(company2.match(word)):
@@ -92,15 +80,39 @@ def replace_word(word):
     person = re.compile("^[A-Z][a-z]+ [A-Z][a-z]+$")  # person
     if bool(person.match(word)):
         return "person"
-    if word.endswith('ing'):  # verb
-        return "verb"
-    if re.search(r'(ion|ty|ics|ment|ence|ance|ness|ist|ism)', word):
+    if word.endswith('ing'):  # ing
+        return "ing"
+    if re.search(r'(fy)',word):
+        return '_verblike_'
+    if word in {'what', 'how', 'when', 'who', 'whom', 'where', 'which', 'whose', 'why'}:
+        return "w_h"
+    if re.search(r'(ion|ty|ics|ment|ence|ance|ness|ist|ism|acy|ice|sion|tion|ency|esis|osis|cian|hood|logy|dom|age)', word):
         return '_NOUNLIKE_'
-    if re.search(r'(ate|fy|ize|en|em)', word):
-        return '_VERBLIKE_'
-    if re.search(r'(un|in|ble|ry|ish|ious|ical|non)', word):
+    if re.search(r'(ish|able|ables|ful|less)', word):
         return '_ADJLIKE_'
-
+    if word.endswith('est'):
+        return 'superlative'
+    if word.endswith('er') or word == 'less' or word == 'more' or word == 'worse':
+        return 'comparative'
+    if word in {'this', 'that', 'these', 'those','such', 'rather', 'quite'}:
+        return "determines"
+    if word.lower() in {'sunday','monday','tuesday','wednesday','thursday','friday','saturday','yesterday'}:
+        return "day"
+    if word in {'i', 'he', 'she', 'you', 'it'}:
+        return 'personal_pronoun'
+    if word in {'but', 'nor', 'or', 'yet', 'so'}:
+        return 'Coordinating_Conjunction'
+    capperiod = re.compile("^[A-Z].$")  # cap period
+    if bool(capperiod.match(word)):
+        return "capPeriod"
+    if word.isupper():
+        return "allCaps"
+    capword = re.compile("^[A-Z][a-z]+$")  # cap word
+    if bool(capword.match(word)):
+        return "initCap"
+    if word.islower():
+        print word
+        return "lowerCase"
     ### END YOUR CODE
     return "UNK"
 
