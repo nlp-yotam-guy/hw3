@@ -88,11 +88,11 @@ def prune(word, tags):
     if word == 'and':
         return set(['CC', 'NN'])
     if word == ':':
-        return set([':', 'NN'])
+        return set([':'])
     if word == '#':
-        return set(['#', 'NN'])
+        return set(['#'])
     if word == '$':
-        return set(['$', 'NN'])
+        return set(['$'])
     if word.endswith('tion'):
         return set(['NN', 'NNP'])
     if word == '_nounlike_':
@@ -159,6 +159,9 @@ def prune(word, tags):
         return set(['JJ','NN','NNP','NNS','VBG'])
     if word =='person':
         return set(['NN'])
+    if word in {'yet', 'also', 'because','unless'}:
+        return set(['RB','CC','IN'])
+
     return tags
 
 def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_word_tag_counts,e_tag_counts, lambda1, lambda2):
@@ -250,32 +253,35 @@ def hmm_eval(test_data, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e
     print "Start evaluation"
     acc_viterbi = 0.0
     ### YOUR CODE HERE
-    errors = 0
-    lambda1 = 0.5
-    lambda2 = 0.4
-    counter = 0
+
+    #lambdas1 = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1}
+    #lambdas2 = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1}
+    lambdas1 = {0.8}
+    lambdas2 = {0.1}
     print_every = 150
     n = len(test_data)
-    errors_for_test = {}
-    for j in range(n):
-        tags_from_viterbi = hmm_viterbi(test_data[j], total_tokens, q_tri_counts, q_bi_counts, q_uni_counts,
-                                        e_word_tag_counts, e_tag_counts, lambda1, lambda2)
-        for i in range(len(tags_from_viterbi)):
-            if test_data[j][i][1] != tags_from_viterbi[i]:
-                add_to_dict(test_data[j][i][0],  errors_for_test)
-                print test_data[j][i][0],test_data[j][i][1], tags_from_viterbi[i]
-                errors += 1
-            counter += 1
+    for lambda1 in lambdas1:
+        for lambda2 in lambdas2:
+            if lambda1 + lambda2 < 1:
+                errors = 0
+                counter = 0
+                errors_for_test = {}
+                for j in range(n):
+                    tags_from_viterbi = hmm_viterbi(test_data[j], total_tokens, q_tri_counts, q_bi_counts, q_uni_counts,
+                                                    e_word_tag_counts, e_tag_counts, lambda1, lambda2)
+                    for i in range(len(tags_from_viterbi)):
+                        if test_data[j][i][1] != tags_from_viterbi[i]:
+                            #add_to_dict(test_data[j][i][0],  errors_for_test)
+                            #print test_data[j][i][0],test_data[j][i][1], tags_from_viterbi[i]
+                            errors += 1
+                        counter += 1
 
-        # if j%print_every == 0:
-        #     print 'sentences: ', j
-        #     print 'error rate: ', float(errors)/counter
-    sorted_errors_for_test = sorted(errors_for_test.items(), key=lambda kv: kv[1])
-    print sorted_errors_for_test[-10:]
-    acc = 1 - float(errors) / counter
-    if acc > acc_viterbi:
-        acc_viterbi = acc
-    print "accuracy: " + str(acc)
+                #sorted_errors_for_test = sorted(errors_for_test.items(), key=lambda kv: kv[1])
+                #print sorted_errors_for_test[-10:]
+                acc = 1 - float(errors) / counter
+                if acc > acc_viterbi:
+                    acc_viterbi = acc
+                print "lambda1 = " + str(lambda1) + ", lambda2 = " + str(lambda2) + " accuracy: " + str(acc)
 
 
     ### END YOUR CODE
