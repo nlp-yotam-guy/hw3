@@ -118,8 +118,7 @@ def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments)
     S[-2] = {'*'}
     # base case
     pi[(0,'*','*')] = 1
-    end_max_prob = 0
-    teta = logreg.get_params
+    end_max_prob = float('-Inf')
     for k in range(n):
         features = extract_features(sent, k)
         vectorized = vectorize_features(vec, features)
@@ -130,7 +129,8 @@ def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments)
         # rest of viterbi algorithm
         for u in S[k-1]:
             for v in S[k]:
-                max_prob = 0
+                prob_max = float('-Inf')
+                bp_max = None
                 for w in S[k-2]:
                     # ***** calculate p somehow ******* (maybe use 'predict_proba' in some way)
                     features = extract_features(v, k)
