@@ -102,6 +102,7 @@ def memm_greedy(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments):
     ### END YOUR CODE
     return predicted_tags
 
+
 def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments):
     """
         Receives: a sentence to tag and the parameters learned by memm

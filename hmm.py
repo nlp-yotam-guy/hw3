@@ -82,85 +82,83 @@ def get_all_tags(e_word_tag_counts, word):
 def prune(word, tags):
     word = word.lower()
     if word == ',':
-        return set([','])
+        return {','}
     if word == '.':
-        return set(['.'])
+        return {'.'}
     if word == 'and':
-        return set(['CC', 'NN'])
+        return {'CC', 'NN'}
     if word == ':':
-        return set([':'])
+        return {':'}
     if word == '#':
-        return set(['#'])
+        return {'#'}
     if word == '$':
-        return set(['$'])
+        return {'$'}
     if word.endswith('tion'):
-        return set(['NN', 'NNP'])
+        return {'NN', 'NNP'}
     if word == '_nounlike_':
-        return set(['NNP', 'NNS','JJ','NN'])
+        return {'NNP', 'NNS','JJ','NN'}
     if word == 'to':
-        return set(['TO', 'NN'])
+        return {'TO', 'NN'}
     if word == 'from':
-        return set(['CC', 'NN', 'IN'])
+        return {'CC', 'NN', 'IN'}
     if word == 'with':
-        return set(['NN', 'IN'])
+        return {'NN', 'IN'}
     if word in {'on', 'by', 'at'}:
-        return set(['RP', 'IN'])
+        return {'RP', 'IN'}
     if word == 'the':
-        return set(['DT'])
+        return {'DT'}
     if word == '``':
-        return set(['``'])
+        return {'``'}
     if word == 'a':
-        return set(['IN', 'DT'])
+        return {'IN', 'DT'}
     if word == 'in':
-        return set(['IN'])
+        return {'IN'}
     if word == 'about':
-        return set(['IN', 'RB'])
+        return {'IN', 'RB'}
     if word in {'what', 'how', 'when', 'who', 'whom', 'where', 'which', 'whose', 'why'} or word == 'w_h':
-        return set(['WDT', 'WP', 'WP$', 'WRB'])
+        return {'WDT', 'WP', 'WP$', 'WRB'}
     if word == 'but' or word == 'coordinating_conjunction':
-        return set(['CC'])
+        return {'CC'}
     if word == 'that':
-        return set(['CC', 'IN', 'DT', 'WDT'])
+        return {'CC', 'IN', 'DT', 'WDT'}
     if word in {'one', 'two', 'three', 'four', 'five'}:
-        return set(['CD'])
+        return {'CD'}
     if word == 'up':
-        return set(['IN', 'RB', 'RP'])
-    if word == 'over':
-        return set(['IN', 'RB', 'JJ'])
+        return {'IN', 'RB', 'RP'}
+    if word in {'over', 'under'}:
+        return {'IN', 'RB', 'JJ'}
     if word == '-lrb-':
-        return set(['-LRB-'])
-    if word == 'under':
-        return set(['IN', 'RB', 'JJ'])
+        return {'-LRB-'}
     if word in {'i', 'he', 'she', 'you', 'it'} or word == 'personal_pronoun':
-        return set(['PRP'])
+        return {'PRP'}
     if word == 'allcaps':
-        return set(['NN', 'JJ', 'NNS', 'NNP', 'VBD', 'RB'])
+        return {'NN', 'JJ', 'NNS', 'NNP', 'VBD', 'RB'}
     if word == '_verblike_':
-        return set(['NNS','JJ','VBZ','VB','VBD','VBN'])
+        return {'NNS','JJ','VBZ','VB','VBD','VBN'}
     if word == 'ing':
-        return set(['VBP','VBG','NNS','JJ'])
+        return {'VBP','VBG','NNS','JJ'}
     if word == 'superlative_like':
-        return set(['JJS'])
+        return {'JJS'}
     if word == 'comparative_like' or word.endswith('ier'):
-        return set(['JJR','NNP','NN','JJ','RBR'])
+        return {'JJR','NNP','NN','JJ','RBR'}
     if word == 'determines':
-        return set(['DT'])
+        return {'DT'}
     if word == 'adverb':
-        return set(['RB'])
+        return {'RB'}
     if word == 'day':
-        return set(['NN','RB'])
+        return {'NN','RB'}
     if word == '_adjlike_':
-        return set(['JJ','NNS','NNP','VBN','VBD','VB','VBZ'])
+        return {'JJ','NNS','NNP','VBN','VBD','VB','VBZ'}
     if word == 'as':
-        return set(['RB', 'IN','CC'])
+        return {'RB', 'IN','CC'}
     if word == '_verblike_':
-        return set(['VB','VBN'])
+        return {'VB','VBN'}
     if word == 'company':
-        return set(['JJ','NN','NNP','NNS','VBG'])
+        return {'JJ','NN','NNP','NNS','VBG'}
     if word =='person':
-        return set(['NN'])
+        return {'NN'}
     if word in {'yet', 'also', 'because','unless'}:
-        return set(['RB','CC','IN'])
+        return {'RB','CC','IN'}
 
     return tags
 
