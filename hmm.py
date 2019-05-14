@@ -188,7 +188,7 @@ def hmm_viterbi(sent, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e_w
     for k in range(n):
         if k <= n-2:
             word = sent[k][0]
-            if sent[k][0] in e_word_tag_counts:
+            if word in e_word_tag_counts:
                 S[k] = set(e_word_tag_counts[sent[k][0]])
                 S[k] = prune(sent[k][0], S[k])
             else:
@@ -252,10 +252,10 @@ def hmm_eval(test_data, total_tokens, q_tri_counts, q_bi_counts, q_uni_counts, e
     acc_viterbi = 0.0
     ### YOUR CODE HERE
 
-    lambdas1 = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1}
-    lambdas2 = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1}
-    #lambdas1 = {0.8}
-    #lambdas2 = {0.1}
+    # lambdas1 = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1}
+    # lambdas2 = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1}
+    lambdas1 = {0.8}
+    lambdas2 = {0.1}
     print_every = 150
     n = len(test_data)
     for lambda1 in lambdas1:

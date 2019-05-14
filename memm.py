@@ -13,6 +13,14 @@ def build_extra_decoding_arguments(train_sents):
 
     extra_decoding_arguments = {}
     ### YOUR CODE HERE
+    extra_decoding_arguments['S'] = dict()
+    for sent in train_sents:
+        for j in range(len(sent)):
+            word = sent[j][0]
+            tag = sent[j][1]
+            if word not in extra_decoding_arguments['S']:
+                extra_decoding_arguments['S'][word] = set()
+            extra_decoding_arguments['S'][word].add(tag)
     ### END YOUR CODE
 
     return extra_decoding_arguments
@@ -102,6 +110,16 @@ def memm_greedy(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments):
     ### END YOUR CODE
     return predicted_tags
 
+def calc_q(sent,vec,k,u,v,t):
+    featurs = extract_features(sent,k)
+    featurs['prev_tag'] = u
+    featurs['prev_prev_tag'] = t
+    featurs['word'] = sent[k][0]
+    v_features = vectorize_features(vec,featurs)
+    pred = logreg.predict_proba(v_features).flatten()
+    idx = tag_to_idx_dict[v]
+    return pred[idx]
+
 
 def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments):
     """
@@ -118,31 +136,28 @@ def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments)
     S[-1] = {'*'}
     S[-2] = {'*'}
     # base case
-    pi[(0,'*','*')] = 1
-    end_max_prob = float('-Inf')
+    pi[(-1,'*','*')] = 1.0
+    max_prob = float('-inf')
     for k in range(n):
         features = extract_features(sent, k)
         vectorized = vectorize_features(vec, features)
         # use predict to get the indices of all possible tags
-        tags_idx = logreg.predict(vectorized)
+        tags_idx = logreg.predict_proba(vectorized).flatten()
         # convert all indices to tags
-        S[k] = set([index_to_tag_dict[i] for i in tags_idx])
+        S[k] = extra_decoding_arguments['S'][sent[k][0]]
         # rest of viterbi algorithm
+        end_max_prob = float('-Inf')
         for u in S[k-1]:
             for v in S[k]:
-                prob_max = float('-Inf')
-                bp_max = None
-                for w in S[k-2]:
-                    # ***** calculate p somehow ******* (maybe use 'predict_proba' in some way)
-                    features = extract_features(v, k)
-                    vectorized = vectorize_features(vec, features)
-                    p = logreg.predict_proba(vectorized)
-                    prob = pi[(k-1, w, u)] * p
-                    # tag = argmax(probabilities)
+                max_prob = float('-inf')
+                # bp_max = None
+                for t in S[k-2]:
+                    q = calc_q(sent,vec,k,u,v,t)
+                    prob = pi[(k-1, t, u)] * q
                     if prob > max_prob:
                         max_prob = prob
                         pi[(k,u,v)] = prob
-                        bp[(k,u,v)] = tag
+                        bp[(k,u,v)] = t
 
             if k == n-1 and pi[(k,u,v)] > end_max_prob:
                 end_max_prob = pi[(k,u,v)]
@@ -151,7 +166,7 @@ def memm_viterbi(sent, logreg, vec, index_to_tag_dict, extra_decoding_arguments)
     predicted_tags[n-1] = yn
     predicted_tags[n-2] = ym
     for j in range(n-3,-1,-1):
-        predicted_tags[j] = bp[(j+2,predicted_tags[j+1],predicted_tags[k+2])]
+        predicted_tags[j] = bp[(j+2,predicted_tags[j+1],predicted_tags[j+2])]
 
     ### END YOUR CODE
     return predicted_tags
@@ -250,7 +265,7 @@ if __name__ == "__main__":
 
     print "Vectorize examples"
     #sliced here
-    all_examples_vectorized = vec.fit_transform(all_examples[:10])
+    all_examples_vectorized = vec.fit_transform(all_examples)
     train_examples_vectorized = all_examples_vectorized[:num_train_examples]
     dev_examples_vectorized = all_examples_vectorized[num_train_examples:]
     print "Done"
@@ -260,7 +275,7 @@ if __name__ == "__main__":
     print "Fitting..."
     start = time.time()
     #sliced here
-    logreg.fit(train_examples_vectorized, train_labels[:10])
+    logreg.fit(train_examples_vectorized, train_labels)
     end = time.time()
     print "End training, elapsed " + str(end - start) + " seconds"
     # End of log linear model training
